@@ -167,6 +167,24 @@ class MumbleAuthenticator(Murmur.ServerUpdatingAuthenticator):
             log.debug('success "%s" %s', name, ' '.join(tags))
         
             ticker = user.alliance.ticker if user.alliance.ticker else '----'
+            
+            rank = ''
+        
+            for t in ['admin', 'supercommand', 'moderator', 'diplo', 'brass', 'fc', 'fc.trial', 'fc.guest', 'dojo']:
+                if t in tags:
+                    rank = t
+                    # Because moderator is long and supercommand is a dumb group name
+                    if rank == 'supercommand':
+                        rank = 'SuperMod'
+                        break
+                    if rank == 'moderator':
+                        rank = 'mod'
+                    rank = rank.capitalize()
+                    break
+            
+            if rank:
+                return (user.character.id, '[{0}] {1} ({2})'.format(ticker, name, rank), tags)
+                
             return (user.character.id, '[{0}] {1}'.format(ticker, name), tags)
             
         except Exception as exc:
